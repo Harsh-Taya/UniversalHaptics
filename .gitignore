@@ -1,0 +1,30 @@
+# Build output
+build/
+build-*/
+probe/
+*.obj
+*.o
+*.exe
+*.dll
+*.so
+*.so.*
+*.lib
+*.exp
+*.pdb
+*.ilk
+CMakeCache.txt
+CMakeFiles/
+
+# Third-party downloads (Eigen, Boost) and vendor SDK files: never commit these
+deps/
+third_party/
+virtuoseAPI*
+VirtuoseDLL*
+*.zip
+
+# Editors / OS
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

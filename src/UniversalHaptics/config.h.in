@@ -1,0 +1,19 @@
+/******************************************************************************
+*  UniversalHaptics -- device-independent haptics for SOFA                    *
+******************************************************************************/
+#pragma once
+
+#include <sofa/config.h>
+
+#ifdef SOFA_BUILD_UNIVERSALHAPTICS
+#  define SOFA_TARGET UniversalHaptics
+#  define SOFA_UNIVERSALHAPTICS_API SOFA_EXPORT_DYNAMIC_LIBRARY
+#else
+#  define SOFA_UNIVERSALHAPTICS_API SOFA_IMPORT_DYNAMIC_LIBRARY
+#endif
+
+namespace universalhaptics
+{
+    constexpr const char* MODULE_NAME = "@PROJECT_NAME@";
+    constexpr const char* MODULE_VERSION = "@PROJECT_VERSION@";
+} // namespace universalhaptics
