@@ -13,7 +13,7 @@ Tested by hand with the real devices, October–November 2026, SOFA v26.06:
 | | Geomagic Touch | Haption Virtuose Desktop 6D |
 |---|---|---|
 | **Linux** (Ubuntu 24.04) | ✅ device test (`uh_probe`): ~1020 Hz, spring force felt<br>✅ SOFA scene: tool follows the stylus, contact force felt | ✅ device test (`uh_probe`): ~1000 Hz, spring force felt<br>✅ SOFA scene: contact force felt |
-| **Windows** (10/11, MSVC) | ✅ device test (`uh_probe`): ~940–1000 Hz, spring force felt<br>✅ SOFA scene: tool follows the stylus, contact force felt | ⚠️ **not yet run with the device.** The Haption code builds on Windows, and everything it shares with the Touch (SOFA component, runtime DLL loading, servo loop) is tested there. Not yet run: the Haption-specific part (`virtuoseAPI.dll`, the Windows haptic service) |
+| **Windows** (10/11, MSVC) | ✅ device test (`uh_probe`): ~940–1000 Hz, spring force felt<br>✅ SOFA scene: tool follows the stylus, contact force felt | ✅ **simulator test** (27 Nov 2026): `uh_probe` loaded `virtuoseAPI.dll`, connected to Haption’s simulator (VirtuoseSIM) and ran the servo loop<br>⚠️ **not yet run with the real arm** (Windows haptic service, network, force feel) |
 
 Before relying on it, see **Known issues** below.
 
@@ -129,6 +129,8 @@ uh_probe touch 15 50                # Touch, 15 s, weak 50 N/m spring towards th
 uh_probe haption 10 --haption 127.0.0.1#5000     # Haption; use your service's API port
 uh_probe haption 15 50 --haption 127.0.0.1#5000  # Haption with the weak spring
 ```
+**Without the arm: Haption’s simulator (VirtuoseSIM).** It answers like the real haptic service. On Windows: run `HAPTIC_server_virtuoseSIM.exe`, note its port, click Run → Power → Deadman, then `uh_probe haption 10 --haption 127.0.0.1#<port>` (with `UH_VIRTUOSE_LIB` pointing to `virtuoseAPI.dll` if needed). On Linux it must run as root. If its Deadman doesn’t register, set `UH_IGNORE_DEADMAN=1` **for the simulator only**. The simulated arm doesn’t move and there is no force to feel, so this checks the connection and the loop, not axes or feel.
+
 It prints which backend was used (and why the others were skipped), then the position (m), orientation (quaternion), buttons, `ready` and the servo rate. Expect ~1000 Hz and `ready` = 1. With a spring, the handle should **pull back** towards where it started.
 
 ## 6. Run a SOFA scene
@@ -180,7 +182,7 @@ There are two ways to wire it into a scene:
 
 ## Known issues
 
-- **Haption on Windows:** not yet run with the device (see Test status). On Windows, check the service's API port (5000 or 53210) and allow it through the firewall.
+- **Haption on Windows:** tested against VirtuoseSIM only, not yet with the real arm (see Test status). With the real device, check the Windows service's API port (5000 or 53210) and allow it through the firewall.
 - **Haption axis directions** have not been verified on the real arm. The axis mapping follows HAPI's convention for the Virtuose: common (x, y, z) = Virtuose (y, z, x). Move the handle right, up and towards you, and check the tool moves the same way. If one is flipped, fix it in `VirtuoseBackend.cpp`.
 - **Example scenes' orientation:** they use `orientationBase="0 0.707 0 -0.707"` (a 90° turn about the vertical axis), copied from SOFA's `Geomagic-RigidSphere.scn`. On Windows the motion looked rotated relative to the screen. Use `orientationBase="0 0 0 1"` if you want no rotation.
 - **`VirtuoseBackend::servoLoop`:**
